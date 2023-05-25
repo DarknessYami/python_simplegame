@@ -163,9 +163,39 @@ class SimpleGame:
         #战斗系统
     def Fight_canvas(self):
         self.Fight_canvas = tk.Canvas(self.PlayTheGame, width=1920, height=1080, bg=None)
-        self.Fight_canvas.place(x=0, y=0)
-        
-        
+        self.Fight_canvas.place(x=0, y=0) 
+        #小怪血条
+        self.Fight_canvas_Redset = tk.Canvas(self.PlayTheGame, width=395, height=25, bg="#9c9c9c")
+        self.Fight_canvas_Redset.place(x=130, y=180)                            
+        self.Fight_canvas_Red = tk.Canvas(self.Fight_canvas_Redset, width=385, height=15, bg="#c4161e")
+        self.Fight_canvas_Red.place(x=5, y=5)
+        #人物血条
+        self.Fight_canvas_Redset = tk.Canvas(self.PlayTheGame, width=395, height=25, bg="#9c9c9c")
+        self.Fight_canvas_Redset.place(x=960, y=480)
+        self.Fight_canvas_Green = tk.Canvas(self.Fight_canvas_Redset, width=385, height=15, bg="#277f00")
+        self.Fight_canvas_Green.place(x=5, y=5)
+        self.Fight_canvas.create_text(970, 405, text=self.name + "[Level:   " + str(self.Player_Level) + "  ]", anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
+        #人物
+        self.Fight_canvas_playerimg = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/战斗系统/player.png")
+        self.Fight_canvas.create_image(1024, 530, image=self.Fight_canvas_playerimg, anchor="nw")
+        #战斗记录
+        self.Fight_canvas_noteset = tk.Canvas(self.PlayTheGame, width=500, height=1030, bg="#d4d4d4")
+        self.Fight_canvas_noteset.place(x=1400, y=20)  
+        self.Fight_canvas_noteset.create_text(8, 8, text="战斗记录", anchor="nw", fill="black", font=("微软雅黑", 17, "bold"))
+        #技能栏
+        self.Fight_canvas_skillset = tk.Canvas(self.PlayTheGame, width=760, height=230, bg="#d4d4d4")
+        self.Fight_canvas_skillset.place(x=620, y=820)
+        self.Fight_canvas_skillchoose_0 = tk.Button(self.PlayTheGame,text="物理攻击", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,)
+        self.Fight_canvas_skillchoose_0.place(x=500,y=820)     
+        self.Fight_canvas_skillchoose_1 = tk.Button(self.PlayTheGame,text="魔法技能", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,)
+        self.Fight_canvas_skillchoose_1.place(x=500,y=880)
+        self.Fight_canvas.create_text(470, 877,text="◆",fill="black",font=("微软雅黑", 24, "bold"), anchor="nw")
+        self.Fight_canvas_skillchoose_2 = tk.Button(self.PlayTheGame,text="道具", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,)
+        self.Fight_canvas_skillchoose_2.place(x=520,y=940)
+        self.Fight_canvas_skillchoose_3 = tk.Button(self.PlayTheGame,text="逃跑", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,)
+        self.Fight_canvas_skillchoose_3.place(x=520,y=1000)
+        #人物立绘 x446 y574
+
 #————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 #下面的代码为初始创建角色相关的代码
 #Player_create_info = 左侧人物属性面板
