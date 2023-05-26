@@ -61,7 +61,7 @@ class SimpleGame:
     def Player_Create_set(self):
         # 创建 Toplevel 窗口
         self.Player_Create_set = tk.Toplevel(self.win,width=1280,height=800)
-        self.Player_Create_set.iconbitmap('E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/qiji.ico')
+        self.Player_Create_set.iconbitmap('python_simplegame\\qiji.ico')
         self.Player_Create_set.title("你正在塑造你的小人……")
         self.Player_Create_set.withdraw()
     def Player_Create(self):
@@ -70,11 +70,11 @@ class SimpleGame:
     def MenuGameCanvas(self):# 主页画布
         self.GameCanvas = tk.Canvas(self.win,width=1280,height=800,highlightthickness=0,borderwidth=0)
         self.GameCanvas.place(x=0,y=0)
-        self.Game_logo = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/anniu/Title.png")
+        self.Game_logo = tk.PhotoImage(file="python_simplegame\\mainimg\\Title.png")
         self.GameCanvas_img1 = self.GameCanvas.create_image(0,0,image=self.Game_logo,anchor='nw')
-        self.GameCanvas_buttom1 = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/anniu/kaishiyouxi.png")
-        self.GameCanvas_buttom2 = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/anniu/jixuyouxi.png")
-        self.GameCanvas_buttom3 = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/anniu/tuichuyoxui.png")
+        self.GameCanvas_buttom1 = tk.PhotoImage(file="python_simplegame\\mainimg\\kaishiyouxi.png")
+        self.GameCanvas_buttom2 = tk.PhotoImage(file="python_simplegame\\mainimg\\jixuyouxi.png")
+        self.GameCanvas_buttom3 = tk.PhotoImage(file="python_simplegame\\mainimg\\tuichuyoxui.png")
         self.GameCanvas_c_buttom1 = tk.Button(self.GameCanvas,image=self.GameCanvas_buttom1,bd=0,command=self.Player_Create)
         self.GameCanvas_c_buttom2 = tk.Button(self.GameCanvas,image=self.GameCanvas_buttom2,bd=0,command=self.PlayTheGameToplevel_change)
         self.GameCanvas_c_buttom3 = tk.Button(self.GameCanvas,image=self.GameCanvas_buttom3,bd=0,command=self.win.quit)
@@ -82,7 +82,7 @@ class SimpleGame:
         self.GameCanvas_c_buttom2.place(x=325,y=400)
         self.GameCanvas_c_buttom3.place(x=325,y=480)
     def Player_file(self): #创建人物数据存档
-        self.Player_file = open("./Player_save.txt",'w') 
+        self.Player_file = open("python_simplegame\\save\\Player_save.txt",'w') 
         self.Player_file.write(str(self.name) +'\r')    #姓名
         self.Player_file.write(str(self.Race) + '\r')   #种族
         self.Player_file.write(str(self.Magical_adaptability) + '\r')   #魔法适应程度
@@ -94,7 +94,7 @@ class SimpleGame:
         self.Player_file.write(str(self.Int_coefficient) +'\r') #智力成长系数
         self.Player_file.close()
     def Player_file_login(self):#读取人物数据存档
-        self.Player_file_login = open("./Player_save.txt",'r')
+        self.Player_file_login = open("python_simplegame\\save\\Player_save.txt",'r')
         name = self.Player_file_login.readline()
         race = self.Player_file_login.readline()
         Magical_adaptability = self.Player_file_login.readline()
@@ -176,7 +176,7 @@ class SimpleGame:
         self.Fight_canvas_Green.place(x=5, y=5)
         self.Fight_canvas.create_text(970, 405, text=self.name + "[Level:   " + str(self.Player_Level) + "  ]", anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
         #人物
-        self.Fight_canvas_playerimg = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/战斗系统/player.png")
+        self.Fight_canvas_playerimg = tk.PhotoImage(file="python_simplegame\\playerimg\\player.png")
         self.Fight_canvas.create_image(1024, 530, image=self.Fight_canvas_playerimg, anchor="nw")
         #战斗记录
         self.Fight_canvas_noteset = tk.Canvas(self.PlayTheGame, width=500, height=1030, bg="#d4d4d4")
@@ -195,6 +195,11 @@ class SimpleGame:
         self.Fight_canvas_skillchoose_3 = tk.Button(self.PlayTheGame,text="逃跑", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,)
         self.Fight_canvas_skillchoose_3.place(x=520,y=1000)
         #人物立绘 x446 y574
+        self.Fight_canvas_playerimg_1 = tk.PhotoImage(file="python_simplegame\\playerimg\\player_set.png")
+        self.Fight_canvas.create_image(0, 520, image=self.Fight_canvas_playerimg_1, anchor="nw")
+
+
+
 
 #————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 #下面的代码为初始创建角色相关的代码
@@ -663,7 +668,7 @@ class SimpleGame:
     def PlayTheGame(self):
         self.PlayTheGame = tk.Toplevel(self.Player_Create_set,width=1920,height=1080)
         self.PlayTheGame.title("欢迎来到蒂斯亚克大陆！")
-        self.PlayTheGame.iconbitmap('E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/qiji.ico')
+        self.PlayTheGame.iconbitmap('python_simplegame\\qiji.ico')
         self.PlayTheGame.attributes('-fullscreen', True)
         self.PlayTheGame.withdraw()
         # self.MenuTopSet()
@@ -707,12 +712,12 @@ class SimpleGame:
     def create_play_game_main_canvas(self):
         self.play_game_main_canvas = tk.Canvas(self.PlayTheGame, width=1920, height=1080, bg=None)
         self.play_game_main_canvas.place(x=0, y=0)
-        self.play_game_main_photo_0 = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/UI/游戏主题UI设计.png")
+        self.play_game_main_photo_0 = tk.PhotoImage(file="python_simplegame\\mainui\\游戏主题UI设计.png")
         self.play_game_main_canvas.create_image(0, 783, image=self.play_game_main_photo_0, anchor="nw")
-        self.play_game_main_photo_1 = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/UI/人物.png")
-        self.play_game_main_photo_2 = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/UI/装备.png")
-        self.play_game_main_photo_3 = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/UI/物品.png")
-        self.play_game_main_photo_4 = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/UI/任务.png")
+        self.play_game_main_photo_1 = tk.PhotoImage(file="python_simplegame\\mainui\\人物.png")
+        self.play_game_main_photo_2 = tk.PhotoImage(file="python_simplegame\\mainui\\装备.png")
+        self.play_game_main_photo_3 = tk.PhotoImage(file="python_simplegame\\mainui\\物品.png")
+        self.play_game_main_photo_4 = tk.PhotoImage(file="python_simplegame\\mainui\\任务.png")
         self.play_game_main_choose_1 = tk.Button(self.play_game_main_canvas,image=self.play_game_main_photo_1,bd=0,command=self.create_play_game_main_canvas__Characterattributes)
         self.play_game_main_choose_1.place(x=1172,y=820)
         self.play_game_main_choose_2 = tk.Button(self.play_game_main_canvas,image=self.play_game_main_photo_2,bd=0,)
@@ -760,7 +765,7 @@ class SimpleGame:
         self.create_play_game_main_canvas()                                                                  #bg="#ffca58"
         self.play_game_main_canvas__Characterattributes = tk.Canvas(self.PlayTheGame, width=1920, height=775, bg=None)
         self.play_game_main_canvas__Characterattributes.place(x=-2, y=0)
-        self.play_game_main_canvasphoto__Characterattributes = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/UI/人物属性/人物属性-介绍.png")
+        self.play_game_main_canvasphoto__Characterattributes = tk.PhotoImage(file="python_simplegame\\mainui\\人物属性\\人物属性-介绍.png")
         self.play_game_main_canvas__Characterattributes.create_image(0, 0, image=self.play_game_main_canvasphoto__Characterattributes, anchor="nw")
         #技能点描述
         self.play_game_main_canvas__Characterattributes.create_text(520,25,text=self.Skinpoint, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
@@ -797,25 +802,25 @@ class SimpleGame:
         self.play_game_main_canvas__Characterattributes.create_text(220,655,text=self.Player_now, anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
         self.play_game_main_canvas__Characterattributes.create_text(220,705,text=self.Player_need, anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
         #按钮放置
-        self.play_game_main_canvasphoto__Characterattributes_1 = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/UI/人物属性/加点.png")
+        self.play_game_main_canvasphoto__Characterattributes_1 = tk.PhotoImage(file="python_simplegame\\mainui\\人物属性\\加点.png")
         self.play_game_main_choose_0 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_1,bd=0,)
         self.play_game_main_choose_0.place(x=470,y=100)
         self.play_game_main_choose_1 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_1,bd=0,)
         self.play_game_main_choose_1.place(x=470,y=150)
         self.play_game_main_choose_2 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_1,bd=0,)
         self.play_game_main_choose_2.place(x=470,y=200)
-        self.play_game_main_canvasphoto__Characterattributes_2 = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/UI/人物属性/提升等级.png")
+        self.play_game_main_canvasphoto__Characterattributes_2 = tk.PhotoImage(file="python_simplegame\\mainui\\人物属性\\提升等级.png")
         self.play_game_main_choose_3 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_2,bd=0,)
         self.play_game_main_choose_3.place(x=1005,y=565)
-        self.play_game_main_canvasphoto__Characterattributes_3 = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/UI/人物属性/确认应用.png")
+        self.play_game_main_canvasphoto__Characterattributes_3 = tk.PhotoImage(file="python_simplegame\\mainui\\人物属性\\确认应用.png")
         self.play_game_main_choose_4 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_3,bd=0,command=self.create_play_game_main_canvas_playerinforeload)
         self.play_game_main_choose_4.place(x=1005,y=625)
-        self.play_game_main_canvasphoto__Characterattributes_4 = tk.PhotoImage(file="E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/UI/人物属性/返回.png")
+        self.play_game_main_canvasphoto__Characterattributes_4 = tk.PhotoImage(file="python_simplegame\\mainui\\人物属性\\返回.png")
         self.play_game_main_choose_5 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_4,bd=0,command=self.create_play_game_main_canvas)
         self.play_game_main_choose_5.place(x=1005,y=685)
 
 if __name__ == "__main__":
     win = Tk()
-    win.iconbitmap('E:/「 コンピューター復習資料 」/《自制》Python复习资料/个人练习/qiji.ico')
+    win.iconbitmap('python_simplegame\\qiji.ico')
     SimpleGame(win)
     win.mainloop()
