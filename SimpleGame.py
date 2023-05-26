@@ -192,7 +192,7 @@ class SimpleGame:
         self.Fight_canvas.create_text(470, 877,text="◆",fill="black",font=("微软雅黑", 24, "bold"), anchor="nw")
         self.Fight_canvas_skillchoose_2 = tk.Button(self.PlayTheGame,text="道具", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,)
         self.Fight_canvas_skillchoose_2.place(x=520,y=940)
-        self.Fight_canvas_skillchoose_3 = tk.Button(self.PlayTheGame,text="逃跑", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,)
+        self.Fight_canvas_skillchoose_3 = tk.Button(self.PlayTheGame,text="逃跑", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,command=self.create_play_game_main_canvas)
         self.Fight_canvas_skillchoose_3.place(x=520,y=1000)
         #人物立绘 x446 y574
         self.Fight_canvas_playerimg_1 = tk.PhotoImage(file="python_simplegame\\playerimg\\player_set.png")
