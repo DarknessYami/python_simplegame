@@ -29,7 +29,7 @@ class SimpleGame:
     Crit_d = 1.5              #暴击伤害  
     Crit_r = 0.0              #暴击抵抗
     Sidestep_p = 0.0          #闪避概率
-    Sidestep_r = 0.0          #闪避抵抗
+    Sidestep_r = 0.0          #闪避抵抗da
     Attact_deepen = 0.0       #伤害加深
     Attact_deduction = 0.0    #伤害减免
     Luck = 0.0    
