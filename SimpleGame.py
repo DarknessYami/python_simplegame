@@ -1,5 +1,7 @@
 from tkinter import *
 import tkinter as tk
+
+import Incident #导入事件
 class SimpleGame:
     HP = 100
     HP_Max = 100
@@ -30,6 +32,9 @@ class SimpleGame:
     Attact_deepen = 0.0       #伤害加深
     Attact_deduction = 0.0    #伤害减免
     Luck = 0.0    
+    ps = 100                  #当前体力
+    ps_max = 100              #最大体力
+    getitem = []              #战利品
 
     def __init__(self,master):
         self.win = master
@@ -38,10 +43,8 @@ class SimpleGame:
         self.Player_Create_set() # 创建 Toplevel 创造人物窗口
         self.PlayTheGame()# 创建游戏主要窗口
         self.MenuGameCanvas() #创建开始界面窗口
-
         self.Player_create_info()
         self.player_set_start()
-
 
     # def MenuTopSet(self):    # 菜单创建
     #     self.Menu_set = tk.Menu(self.PlayTheGame)
@@ -160,7 +163,9 @@ class SimpleGame:
         self.Defense = "                     "
         self.Defense = self.Defense_set
         self.create_play_game_main_canvas()
-        #战斗系统
+
+#—————————————————————————————————————————————————↓↓↓↓↓战斗系统管理↓↓↓↓↓——————————————————————————————————————————————————————————————————————————————————
+    #战斗系统的画面设置
     def Fight_canvas(self):
         self.Fight_canvas = tk.Canvas(self.PlayTheGame, width=1920, height=1080, bg=None)
         self.Fight_canvas.place(x=0, y=0) 
@@ -192,15 +197,90 @@ class SimpleGame:
         self.Fight_canvas.create_text(470, 877,text="◆",fill="black",font=("微软雅黑", 24, "bold"), anchor="nw")
         self.Fight_canvas_skillchoose_2 = tk.Button(self.PlayTheGame,text="道具", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,)
         self.Fight_canvas_skillchoose_2.place(x=520,y=940)
-        self.Fight_canvas_skillchoose_3 = tk.Button(self.PlayTheGame,text="逃跑", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,command=self.create_play_game_main_canvas)
+        self.Fight_canvas_skillchoose_3 = tk.Button(self.PlayTheGame,text="逃跑", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,command=self.Map_levelchoose)
         self.Fight_canvas_skillchoose_3.place(x=520,y=1000)
         #人物立绘 x446 y574
         self.Fight_canvas_playerimg_1 = tk.PhotoImage(file="python_simplegame\\playerimg\\player_set.png")
         self.Fight_canvas.create_image(0, 520, image=self.Fight_canvas_playerimg_1, anchor="nw")
-
-
-
-
+#—————————————————————————————————————————————————↑↑↑↑↑战斗系统管理↑↑↑↑↑——————————————————————————————————————————————————————————————————————————————————
+#
+#—————————————————————————————————————————————————↓↓↓↓↓随机事件管理↓↓↓↓↓——————————————————————————————————————————————————————————————————————————————————
+    def Incident_order(self):
+        self.ps_if_()
+        self.Incident_canvas = tk.Canvas(self.PlayTheGame, width=1920, height=775, bg=None)
+        self.Incident_canvas.place(x=-2, y=0)
+        self.I_label_ = tk.Label(self.Incident_canvas,text="体力值:",font=('微软雅黑',17, "bold"),anchor='nw')
+        self.I_label_.place(x=50,y=50)
+        self.I_label_ = tk.Label(self.Incident_canvas,text=self.ps,font=('微软雅黑',17, "bold"),anchor='nw')
+        self.I_label_.place(x=150,y=50)
+        self.I_label_ = tk.Label(self.Incident_canvas,text="/",font=('微软雅黑',17, "bold"),anchor='nw')
+        self.I_label_.place(x=200,y=50)
+        self.I_label_ = tk.Label(self.Incident_canvas,text=self.ps_max,font=('微软雅黑',17, "bold"),anchor='nw')
+        self.I_label_.place(x=220,y=50)
+        self.I_label_ = tk.Label(self.Incident_canvas,text="每当你探索一次，就会失去10点体力，体力为0时则将会禁止继续探索。（回复体力的方法：食用能回复体力的道具、探索奇遇等等）",font=('微软雅黑',17),anchor='nw')
+        self.I_label_.place(x=350,y=150)
+        self.I_button_ = tk.Button(self.Incident_canvas,text="继续", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.AreaLevel10_canvas_)
+        self.I_button_.place(x=950,y=540)
+    def AreaLevel10_canvas_(self):
+        if self.ps != 0:
+            self.ps -= 10
+            self.Incident_order()
+            self.AreaLevel10_canvas = tk.Canvas(self.Incident_canvas, width=1550, height=430, bg=None)
+            self.AreaLevel10_canvas.place(x=185, y=150)
+            self.AreaLevel10_button_ = tk.Button(self.AreaLevel10_canvas,text="继续", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.AreaLevel10_AG)
+            self.AreaLevel10_button_.place(x=765,y=390)
+            Incident.AreaLevel10_Incident(self)
+        else:
+            self.ps_if_()
+    def AreaLevel10_AG(self):
+        self.ps_if_()
+        self.Incident_canvas = tk.Canvas(self.PlayTheGame, width=1920, height=775, bg=None)
+        self.Incident_canvas.place(x=-2, y=0)
+        self.I_label_ = tk.Label(self.Incident_canvas,text="体力值:",font=('微软雅黑',17, "bold"),anchor='nw')
+        self.I_label_.place(x=50,y=50)
+        self.I_label_ = tk.Label(self.Incident_canvas,text=self.ps,font=('微软雅黑',17, "bold"),anchor='nw')
+        self.I_label_.place(x=150,y=50)
+        self.I_label_ = tk.Label(self.Incident_canvas,text="/",font=('微软雅黑',17, "bold"),anchor='nw')
+        self.I_label_.place(x=200,y=50)
+        self.I_label_ = tk.Label(self.Incident_canvas,text=self.ps_max,font=('微软雅黑',17, "bold"),anchor='nw')
+        self.I_label_.place(x=220,y=50)
+        self.AreaLevel10_canvas_()
+    def ps_if_(self):
+        if self.ps == 0:
+            self.Incident_canvas = tk.Canvas(self.PlayTheGame, width=1920, height=775, bg=None)
+            self.Incident_canvas.place(x=-2, y=0)
+            self.I_label_ = tk.Label(self.Incident_canvas,text="体力值:",font=('微软雅黑',17, "bold"),anchor='nw')
+            self.I_label_.place(x=50,y=50)
+            self.I_label_ = tk.Label(self.Incident_canvas,text=self.ps,font=('微软雅黑',17, "bold"),anchor='nw')
+            self.I_label_.place(x=150,y=50)
+            self.I_label_ = tk.Label(self.Incident_canvas,text="/",font=('微软雅黑',17, "bold"),anchor='nw')
+            self.I_label_.place(x=200,y=50)
+            self.I_label_ = tk.Label(self.Incident_canvas,text=self.ps_max,font=('微软雅黑',17, "bold"),anchor='nw')
+            self.I_label_.place(x=220,y=50)
+            self.I_label_ = tk.Label(self.Incident_canvas,text="你透支了全部体力。感到疲惫不堪无法前行！",font=('微软雅黑',18,"bold"),anchor='nw',justify='left')
+            self.I_label_.place(x=400,y=150)
+            self.AreaLevel10_button_ = tk.Button(self.Incident_canvas,text="【返回城镇】", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.Getitem_list)
+            self.AreaLevel10_button_.place(x=900,y=490)
+            self.AreaLevel10_button_ = tk.Button(self.Incident_canvas,text="继续", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.AreaLevel10_AG)
+            self.AreaLevel10_button_.place(x=950,y=540)
+    def Getitem_list(self):
+        if self.ps == 0:
+            self.Incident_canvas = tk.Canvas(self.PlayTheGame, width=1920, height=775, bg=None)
+            self.Incident_canvas.place(x=-2, y=0)
+            self.I_label_ = tk.Label(self.Incident_canvas,text="体力值:",font=('微软雅黑',17, "bold"),anchor='nw')
+            self.I_label_.place(x=50,y=50)
+            self.I_label_ = tk.Label(self.Incident_canvas,text=self.ps,font=('微软雅黑',17, "bold"),anchor='nw')
+            self.I_label_.place(x=150,y=50)
+            self.I_label_ = tk.Label(self.Incident_canvas,text="/",font=('微软雅黑',17, "bold"),anchor='nw')
+            self.I_label_.place(x=200,y=50)
+            self.I_label_ = tk.Label(self.Incident_canvas,text=self.ps_max,font=('微软雅黑',17, "bold"),anchor='nw')
+            self.I_label_.place(x=220,y=50)
+            Incident.Getitem_list_(self)
+            self.getitem = []
+            self.AreaLevel10_button_ = tk.Button(self.Incident_canvas,text="继续", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.create_play_game_main_canvas)
+            self.AreaLevel10_button_.place(x=950,y=540)
+#—————————————————————————————————————————————————↑↑↑↑↑随机事件管理↑↑↑↑↑——————————————————————————————————————————————————————————————————————————————————
+#
 #————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 #下面的代码为初始创建角色相关的代码
 #Player_create_info = 左侧人物属性面板
@@ -748,7 +828,7 @@ class SimpleGame:
     def Map_levelchoose(self):                                 
         self.Map_levelchoose_canvas = tk.Canvas(self.PlayTheGame, width=1920, height=775, bg=None)
         self.Map_levelchoose_canvas.place(x=-2, y=0)
-        self.Map_levelchoose_1 = tk.Button(self.Map_levelchoose_canvas,text="【荒野平原】 Lv10 ",font=("微软雅黑", 22, "bold"),bd=0,command=self.Fight_canvas)
+        self.Map_levelchoose_1 = tk.Button(self.Map_levelchoose_canvas,text="【荒野平原】 Lv10 ",font=("微软雅黑", 22, "bold"),bd=0,command=self.Incident_order)
         self.Map_levelchoose_1.place(x=810,y=140)
         self.Map_levelchoose_2 = tk.Button(self.Map_levelchoose_canvas,text="【厄菲尔海滩】 Lv20 ",font=("微软雅黑", 22, "bold"),bd=0)
         self.Map_levelchoose_2.place(x=790,y=240)
@@ -760,6 +840,7 @@ class SimpleGame:
         self.Map_levelchoose_5.place(x=800,y=540)
         self.Map_levelchoose_6 = tk.Button(self.Map_levelchoose_canvas, text="【返回城镇】", font=("微软雅黑", 22, "bold"), bd=1, command=self.create_play_game_main_canvas)
         self.Map_levelchoose_6.place(x=850,y=640)
+
 
     def create_play_game_main_canvas__Characterattributes(self):
         self.create_play_game_main_canvas()                                                                  #bg="#ffca58"
