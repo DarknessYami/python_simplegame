@@ -1,7 +1,8 @@
 from tkinter import *
 import tkinter as tk
 
-import Incident #导入事件
+import Incident #导入事件模组
+
 class SimpleGame:
     HP = 100
     HP_Max = 100
@@ -40,36 +41,12 @@ class SimpleGame:
         self.win = master
         self.win.geometry("1280x800")
         self.win.title("为美好的小暗献上祝福！ -开发版本beta-0.1-  测试ing")
-        self.Player_Create_set() # 创建 Toplevel 创造人物窗口
+        self.Player_Create_set() # 创建新建人物窗口
         self.PlayTheGame()# 创建游戏主要窗口
         self.MenuGameCanvas() #创建开始界面窗口
         self.Player_create_info()
         self.player_set_start()
 
-    # def MenuTopSet(self):    # 菜单创建
-    #     self.Menu_set = tk.Menu(self.PlayTheGame)
-    #     self.Menu_1 = tk.Menu(self.Menu_set, tearoff=0)
-    #     self.Menu_set.add_cascade(label='菜单', menu = self.Menu_1)
-    #     self.Menu_1.add_command(label='待开发')
-    #     self.Menu_1.add_command(label='待开发')
-    #     self.Menu_1.add_command(label='待开发')
-    #     self.Menu_1.add_separator()  # 添加一条分隔线
-    #     self.Menu_1.add_command(label='退出游戏', command=self.win.quit)
-    #     self.Menu_2 = tk.Menu(self.Menu_set, tearoff=0)
-    #     self.Menu_set.add_cascade(label='功能', menu = self.Menu_2)
-    #     self.Menu_2.add_command(label='待开发')
-    #     self.Menu_2.add_command(label='待开发')
-    #     self.Menu_2.add_command(label='待开发')
-    #     self.PlayTheGame.config(menu = self.Menu_set)
-    def Player_Create_set(self):
-        # 创建 Toplevel 窗口
-        self.Player_Create_set = tk.Toplevel(self.win,width=1280,height=800)
-        self.Player_Create_set.iconbitmap('python_simplegame\\qiji.ico')
-        self.Player_Create_set.title("你正在塑造你的小人……")
-        self.Player_Create_set.withdraw()
-    def Player_Create(self):
-        self.Player_Create_set.deiconify()
-        self.win.withdraw()
     def MenuGameCanvas(self):# 主页画布
         self.GameCanvas = tk.Canvas(self.win,width=1280,height=800,highlightthickness=0,borderwidth=0)
         self.GameCanvas.place(x=0,y=0)
@@ -84,7 +61,11 @@ class SimpleGame:
         self.GameCanvas_c_buttom1.place(x=325,y=320)
         self.GameCanvas_c_buttom2.place(x=325,y=400)
         self.GameCanvas_c_buttom3.place(x=325,y=480)
-    def Player_file(self): #创建人物数据存档
+#—————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+#
+#
+#—————————————————————————————————————————————————↓↓↓↓↓人物存档管理↓↓↓↓↓——————————————————————————————————————————————————————————————————————————————————
+    def Player_file(self): #创建
         self.Player_file = open("python_simplegame\\save\\Player_save.txt",'w') 
         self.Player_file.write(str(self.name) +'\r')    #姓名
         self.Player_file.write(str(self.Race) + '\r')   #种族
@@ -96,7 +77,7 @@ class SimpleGame:
         self.Player_file.write(str(self.Int) +'\r')   #智力
         self.Player_file.write(str(self.Int_coefficient) +'\r') #智力成长系数
         self.Player_file.close()
-    def Player_file_login(self):#读取人物数据存档
+    def Player_file_login(self):#读取
         self.Player_file_login = open("python_simplegame\\save\\Player_save.txt",'r')
         name = self.Player_file_login.readline()
         race = self.Player_file_login.readline()
@@ -117,7 +98,10 @@ class SimpleGame:
         self.Int = Int
         self.Int_coefficient = Int_coefficient
         self.Player_file_login.close()
-
+#—————————————————————————————————————————————————↑↑↑↑↑人物存档管理↑↑↑↑↑——————————————————————————————————————————————————————————————————————————————————
+#
+#
+#—————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
     def player_hp(self):#玩家血量系统
         while(True):
             self.HP_Max_up = int(self.HP_Max) + int(self.Str) * 4
@@ -204,6 +188,8 @@ class SimpleGame:
         self.Fight_canvas.create_image(0, 520, image=self.Fight_canvas_playerimg_1, anchor="nw")
 #—————————————————————————————————————————————————↑↑↑↑↑战斗系统管理↑↑↑↑↑——————————————————————————————————————————————————————————————————————————————————
 #
+#
+#
 #—————————————————————————————————————————————————↓↓↓↓↓随机事件管理↓↓↓↓↓——————————————————————————————————————————————————————————————————————————————————
     def Incident_order(self):
         self.ps_if_()
@@ -281,20 +267,19 @@ class SimpleGame:
             self.AreaLevel10_button_.place(x=950,y=540)
 #—————————————————————————————————————————————————↑↑↑↑↑随机事件管理↑↑↑↑↑——————————————————————————————————————————————————————————————————————————————————
 #
-#————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-#下面的代码为初始创建角色相关的代码
-#Player_create_info = 左侧人物属性面板
-#Player_create_info_reload = 【功能 - 更新属性】
-#player_set_start = 开始创建人物按钮
-#playername = 1、创建人物名称
-#playername_set = 创建人物名称 - 实时映射
-#player_race = 2、创建人物种族
-#player_choose_1 = 3、幼年事件
-#player_choose_2 = 4、少年事件
-#player_choose_3 = 5、青年事件
-#player_choose_4 = 6、战争爆发事件
-#player_choose_5 = 7、家族血仇事件
-#————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+#
+#
+#
+#—————————————————————————————————————————————————↓↓↓↓↓创建角色系统↓↓↓↓↓——————————————————————————————————————————————————————————————————————————————————       
+    def Player_Create_set(self):
+        # 创建新游戏切换窗口
+        self.Player_Create_set = tk.Toplevel(self.win,width=1280,height=800)
+        self.Player_Create_set.iconbitmap('python_simplegame\\qiji.ico')
+        self.Player_Create_set.title("你正在塑造你的小人……")
+        self.Player_Create_set.withdraw()
+    def Player_Create(self):
+        self.Player_Create_set.deiconify()
+        self.win.withdraw()
     def Player_create_info(self):  
         self.Playerinfo_label0 = tk.Label(self.Player_Create_set,text="开始创建人物的初始属性",font=('微软雅黑',15),anchor='nw')
         self.Playerinfo_label0.place(x=25,y=20)
@@ -744,7 +729,13 @@ class SimpleGame:
         self.player_race_choose = tk.Button(self.player_choose,text='前往蒂斯亚克大陆！',font=('微软雅黑',12),bd=3,command=self.PlayTheGameToplevel_change)
         self.player_race_choose.place(x=300,y=150)
         self.Player_file() #创建人物数据存档
-#————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+#—————————————————————————————————————————————————↑↑↑↑↑创建角色系统↑↑↑↑↑——————————————————————————————————————————————————————————————————————————————————
+#
+#          
+#
+#
+#
+#—————————————————————————————————————————————————↓↓↓↓↓主要游戏系统↓↓↓↓↓——————————————————————————————————————————————————————————————————————————————————
     def PlayTheGame(self):
         self.PlayTheGame = tk.Toplevel(self.Player_Create_set,width=1920,height=1080)
         self.PlayTheGame.title("欢迎来到蒂斯亚克大陆！")
@@ -760,8 +751,8 @@ class SimpleGame:
         self.Player_Create_set.withdraw()#关闭人物创建界面
         self.win.withdraw()#关闭开始游戏界面
 #————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-    #初始剧情介绍
-    def PlayTheGame_story_1(self):#                                                  bg="#ffca58"
+    #                                                           初始剧情介绍
+    def PlayTheGame_story_1(self):
         self.PlayTheGame_story = tk.Canvas(self.PlayTheGame,width=1920,height=1080,  bg=None)
         self.PlayTheGame_story.place(x=0,y=0)
         self.PlayTheGame_story.bind("<Button-1>", self.PlayTheGame_story_2)
@@ -838,7 +829,7 @@ class SimpleGame:
         self.Map_levelchoose_4.place(x=800,y=440)
         self.Map_levelchoose_5 = tk.Button(self.Map_levelchoose_canvas,text="【炽焰火山】 Lv50 ",font=("微软雅黑", 22, "bold"),bd=0)
         self.Map_levelchoose_5.place(x=800,y=540)
-        self.Map_levelchoose_6 = tk.Button(self.Map_levelchoose_canvas, text="【返回城镇】", font=("微软雅黑", 22, "bold"), bd=1, command=self.create_play_game_main_canvas)
+        self.Map_levelchoose_6 = tk.Button(self.Map_levelchoose_canvas, text="【返回城镇】", font=("微软雅黑", 22, "bold"), bd=0, command=self.create_play_game_main_canvas)
         self.Map_levelchoose_6.place(x=850,y=640)
 
 
