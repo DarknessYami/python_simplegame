@@ -1,6 +1,5 @@
 from tkinter import *
 import tkinter as tk
-
 #蜘蛛
 def zhizhu(self):
     self.M_HP = 50
@@ -72,7 +71,7 @@ def gebulinchihou(self):
     self.M_Damage_deduction = 0.0    #伤害减免
     self.M_Luck = 0.0
 #哥布林队长【boss】
-def gebulinchihou(self):
+def boss_gebulinchihou(self):
     self.M_HP = 200
     self.M_Damage = 50
     self.M_Defense = 12
