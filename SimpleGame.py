@@ -38,6 +38,8 @@ class SimpleGame:
     ps = 100                  #当前体力
     ps_max = 100              #最大体力
     track = None              #战斗系统——怪物追踪
+    round = 0                 #战斗系统——显示回合数
+    G_round = 0               #战斗系统——系统回合数
     getitem = []              #战利品
 
     M_id = None               #怪物id
@@ -166,47 +168,8 @@ class SimpleGame:
         self.create_play_game_main_canvas()
 
 #—————————————————————————————————————————————————↓↓↓↓↓战斗系统管理↓↓↓↓↓——————————————————————————————————————————————————————————————————————————————————
-    #战斗系统的画面设置
-    def Fight_canvas(self):
-        self.Fight_canvas = tk.Canvas(self.PlayTheGame, width=1920, height=1080, bg=None)
-        self.Fight_canvas.place(x=0, y=0) 
-        #小怪血条
-        self.Fight_canvas_Redset = tk.Canvas(self.PlayTheGame, width=395, height=25, bg="#9c9c9c")
-        self.Fight_canvas_Redset.place(x=130, y=180)                            
-        self.Fight_canvas_Red = tk.Canvas(self.Fight_canvas_Redset, width=385, height=15, bg="#c4161e")
-        self.Fight_canvas_Red.place(x=5, y=5)
-        #人物血条
-        self.Fight_canvas_Redset = tk.Canvas(self.PlayTheGame, width=395, height=25, bg="#9c9c9c")
-        self.Fight_canvas_Redset.place(x=960, y=480)
-        self.Fight_canvas_Green = tk.Canvas(self.Fight_canvas_Redset, width=385, height=15, bg="#277f00")
-        self.Fight_canvas_Green.place(x=5, y=5)
-        self.Fight_canvas.create_text(970, 405, text=self.name + "[Level:   " + str(self.Player_Level) + "  ]", anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
-        self.Fight_canvas.create_text(140, 140, text=self.M_name, anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
-        #人物
-        self.Fight_canvas_playerimg = tk.PhotoImage(file="python_simplegame\\playerimg\\player.png")
-        self.Fight_canvas.create_image(1024, 530, image=self.Fight_canvas_playerimg, anchor="nw")
-        #战斗记录                                                                          "#d4d4d4"
-        self.Fight_canvas_noteset = tk.Canvas(self.PlayTheGame, width=500, height=1030, bg=None)
-        self.Fight_canvas_noteset.place(x=1400, y=20)  
-        self.Fight_canvas_noteset.create_text(8, 8, text="战斗记录", anchor="nw", fill="black", font=("微软雅黑", 17, "bold"))
-        #技能栏
-        self.Fight_canvas_skillset = tk.Canvas(self.PlayTheGame, width=760, height=230, bg="#d4d4d4")
-        self.Fight_canvas_skillset.place(x=620, y=820)
-        self.Fight_canvas_skillchoose_0 = tk.Button(self.PlayTheGame,text="物理攻击", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,)
-        self.Fight_canvas_skillchoose_0.place(x=500,y=820)     
-        self.Fight_canvas_skillchoose_1 = tk.Button(self.PlayTheGame,text="魔法技能", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,)
-        self.Fight_canvas_skillchoose_1.place(x=500,y=880)
-        self.Fight_canvas.create_text(470, 877,text="◆",fill="black",font=("微软雅黑", 24, "bold"), anchor="nw")
-        self.Fight_canvas_skillchoose_2 = tk.Button(self.PlayTheGame,text="道具", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,)
-        self.Fight_canvas_skillchoose_2.place(x=520,y=940)
-        self.Fight_canvas_skillchoose_3 = tk.Button(self.PlayTheGame,text="逃跑", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,command=self.create_play_game_main_canvas)
-        self.Fight_canvas_skillchoose_3.place(x=520,y=1000)
-        #人物立绘 x446 y574
-        self.Fight_canvas_playerimg_1 = tk.PhotoImage(file="python_simplegame\\playerimg\\player_set.png")
-        self.Fight_canvas.create_image(0, 530, image=self.Fight_canvas_playerimg_1, anchor="nw")
-        #怪物立绘
-        self.Fight_canvas_monsterimg = tk.PhotoImage(file="python_simplegame\\Monsterimg\\zhizhu.png")
-        self.Fight_canvas.create_image(200, 240, image=self.Fight_canvas_monsterimg, anchor="nw")
+#战斗系统bug——1：如果进入战斗直接点击下一回合的话  就会执行空白画布接下来玩家不能攻击怪物不能攻击
+
     def Fight_track(self):
         if self.M_id == 1:
             Monsterlist.zhizhu(self)
@@ -222,6 +185,7 @@ class SimpleGame:
             Monsterlist.boss_gebulinchihou(self)
         self.Fight_f_() #启动战斗画面
 
+
     def Fight_luckjudgment(self):
         pluck = self.Luck
         mluck = self.M_Luck
@@ -236,91 +200,204 @@ class SimpleGame:
         elif mluck > pluck:
             self.first = 2
 
-    def Fight_f_(self):
-        self.Fight_canvas()  # 加载画布
-        self.Fight_luckjudgment()  # 加载先后手判定
-        self.Fight_random_c = tk.Button(self.PlayTheGame,text="下一回合", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.Fight_nextround)
-        self.Fight_random_c.place(x=1300,y=700)
-        self.Fightnext = 0
-        round = 1  # 初始化回合数
-        print("玩家当前血量：" + str(self.HP))
-        print("怪物当前血量：" + str(self.M_HP))
-        if self.first == 1:
-            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
-            self.Fight_text.place(x=15, y=150)
-            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
-            self.Fight_text.place(x=15, y=75)
-            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="第" + str(round) + "回合" + "你拿到了先手优势！开始你的操作" + "\n(你的回合)",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475, bg=None)
-            self.Fight_text.place(x=15, y=75)
-            self.Fight_canvas_skillchoose_0 = tk.Button(self.PlayTheGame, text="物理攻击", anchor="nw",font=("微软雅黑", 17, "bold"), bd=0, command=self.FightPlayer_PA)
-            self.Fight_canvas_skillchoose_0.place(x=500, y=820)
-        if self.first == 2:
-            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
-            self.Fight_text.place(x=15, y=150)
-            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
-            self.Fight_text.place(x=15, y=75)
-            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="第" + str(round) + "回合" + "怪物拿到了先手优势！请注意你的状态" + "\n(怪物的回合)",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475, bg=None)
-            self.Fight_text.place(x=15, y=75)
-            self.FightMonster_PA()  # 怪物进行攻击
-            self.Fightnext = 1
-            self.Fight_nextround()
-    
-    def Fight_nextround(self):
-        self.Fight_canvas()  # 加载画布
-        self.Fight_random_c = tk.Button(self.PlayTheGame,text="下一回合", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.Fight_nextround)
-        self.Fight_random_c.place(x=1300,y=700)
-        if self.first == 1:
-            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
-            self.Fight_text.place(x=15, y=150)
-            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
-            self.Fight_text.place(x=15, y=75)
-            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="第" + str(round) + "回合" + "怪物的回合结束了，现在是你的回合！" + "\n(你的回合)",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475, bg=None)
-            self.Fight_text.place(x=15, y=75)
-            self.Fight_canvas_skillchoose_0 = tk.Button(self.PlayTheGame, text="物理攻击", anchor="nw",font=("微软雅黑", 17, "bold"), bd=0, command=self.FightPlayer_PA)
-            self.Fight_canvas_skillchoose_0.place(x=500, y=820)
-            self.FightPlayer_PA()  # 玩家进行攻击
-            self.Fight_hp_j() #玩家hp和怪物hp的检测
-            
-        if self.first == 2:
-            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
-            self.Fight_text.place(x=15, y=150)
-            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
-            self.Fight_text.place(x=15, y=75)
-            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="第" + str(round) + "回合" + "你的回合结束了，现在是怪物的回合！请注意你的状态" + "\n(怪物的回合)",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475, bg=None)
-            self.Fight_text.place(x=15, y=75)
-            self.FightMonster_PA()  # 怪物进行攻击
-            self.Fight_hp_j() #玩家hp和怪物hp的检测
-                        
-                        
+
     def Fight_hp_j(self):
         if self.HP < 0:
+            self.Fight_canvas_setup()  # 加载画布
+            self.Fight_random_c = tk.Button(self.PlayTheGame,text="【退出战斗】", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.create_play_game_main_canvas)
+            self.Fight_random_c.place(x=475,y=750)
             self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
             self.Fight_text.place(x=15, y=150)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=155)
             self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
             self.Fight_text.place(x=15, y=75)
             self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="你不幸重伤倒地。怪物获得了胜利",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
-            self.Fight_text.place(x=15, y=75)
+            self.Fight_text.place(x=15, y=70)
+            
             
         if self.M_HP < 0:
+            self.Fight_canvas_setup()  # 加载画布
+            self.Fight_random_c = tk.Button(self.PlayTheGame,text="【退出战斗】", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.create_play_game_main_canvas)
+            self.Fight_random_c.place(x=475,y=750)
             self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
             self.Fight_text.place(x=15, y=150)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=155)
             self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
             self.Fight_text.place(x=15, y=75)
             self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="怪物被你斩杀！你获得了胜利",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
-            self.Fight_text.place(x=15, y=75)
+            self.Fight_text.place(x=15, y=70)
 
     def FightPlayer_PA(self):
         damage = self.Attact - self.M_Defense
         self.M_HP -= damage
+
         self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="你对其造成了" + str(damage) + "点物理伤害",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475, bg=None)
         self.Fight_text.place(x=15, y=150)
-        self.Fightnext = 2
+        self.G_round = 2
+        self.round += 1
     def FightMonster_PA(self):
         damage = self.M_Damage - self.Defense
         self.HP -= damage
+
         self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="怪物对你造成了" + str(damage) + "点物理伤害",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475, bg=None)
         self.Fight_text.place(x=15, y=150)
-        self.Fightnext = 1
+        self.G_round = 1
+        self.round += 1
+
+    #战斗系统的画面设置
+    def Fight_canvas_setup(self):
+        self.Fight_canvas_ = tk.Canvas(self.PlayTheGame, width=1920, height=1080, bg=None)
+        self.Fight_canvas_.place(x=0, y=0) 
+        #————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        #怪物血条旁边的详细血量（暂定）
+        self.Fight_canvas_.create_text(450,150,text=self.M_HP,anchor="nw", fill="black", font=("微软雅黑", 18))
+        #怪物血条
+        def Fight_canvas_M_hpset():
+            self.Fight_canvas_Redset = tk.Canvas(self.PlayTheGame, width=395, height=25, bg="#9c9c9c")
+            self.Fight_canvas_Redset.place(x=130, y=180)   
+            parent_width_1 = self.Fight_canvas_Redset.winfo_width() # 获取self.Fight_canvas_Redset父容器的宽度
+            relative_width_1 = parent_width_1 * 1.0  # 设置为self.Fight_canvas_Redset父容器宽度的100%                         
+            self.Fight_canvas_Red = tk.Canvas(self.Fight_canvas_Redset, width=relative_width_1, height=15, bg="#c4161e")
+            self.Fight_canvas_Red.place(x=5, y=5)
+        self.PlayTheGame.after(100, Fight_canvas_M_hpset)  # 延迟100毫秒后执行Fight_canvas_M_hpset函数
+        Fight_canvas_M_hpset()
+        #————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        #人物血条旁边的详细血量（暂定）
+        self.Fight_canvas_.create_text(1200,450,text=self.HP,anchor="nw", fill="black", font=("微软雅黑", 18))
+        #人物血条
+        def Fight_canvas_hpset():
+            self.Fight_canvas_Greenset = tk.Canvas(self.PlayTheGame, width=395, height=25, bg="#9c9c9c")
+            self.Fight_canvas_Greenset.place(x=960, y=480)
+            parent_width_2 = self.Fight_canvas_Greenset.winfo_width() # 获取self.Fight_canvas_Greenset父容器的宽度
+            relative_width_2 = parent_width_2 * 1.0  # 设置为self.Fight_canvas_Greenset父容器宽度的100%
+            self.Fight_canvas_Green = tk.Canvas(self.Fight_canvas_Greenset, width=relative_width_2, height=15, bg="#277f00")
+            self.Fight_canvas_Green.place(x=5, y=5)
+        self.PlayTheGame.after(100, Fight_canvas_hpset)  # 延迟100毫秒后执行Fight_canvas_hpset函数
+        Fight_canvas_hpset()
+        #————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+        self.Fight_canvas_.create_text(970, 405, text=self.name + "[Level:   " + str(self.Player_Level) + "  ]", anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
+        self.Fight_canvas_.create_text(140, 140, text=self.M_name, anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
+        #人物
+        self.Fight_canvas_playerimg = tk.PhotoImage(file="python_simplegame\\playerimg\\player.png")
+        self.Fight_canvas_.create_image(1024, 530, image=self.Fight_canvas_playerimg, anchor="nw")
+        #战斗记录                                                                          "#d4d4d4"
+        self.Fight_canvas_noteset = tk.Canvas(self.PlayTheGame, width=500, height=1030, bg=None)
+        self.Fight_canvas_noteset.place(x=1400, y=20)  
+        self.Fight_canvas_noteset.create_text(8, 8, text="战斗记录", anchor="nw", fill="black", font=("微软雅黑", 17, "bold"))
+        #技能栏
+        self.Fight_canvas_skillset = tk.Canvas(self.PlayTheGame, width=760, height=230, bg="#d4d4d4")
+        self.Fight_canvas_skillset.place(x=620, y=820)
+        self.Fight_canvas_skillchoose_0 = tk.Button(self.PlayTheGame,text="物理攻击", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,)
+        self.Fight_canvas_skillchoose_0.place(x=500,y=820)     
+        self.Fight_canvas_skillchoose_1 = tk.Button(self.PlayTheGame,text="魔法技能", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,)
+        self.Fight_canvas_skillchoose_1.place(x=500,y=880)
+        self.Fight_canvas_.create_text(470, 877,text="◆",fill="black",font=("微软雅黑", 24, "bold"), anchor="nw")
+        self.Fight_canvas_skillchoose_2 = tk.Button(self.PlayTheGame,text="道具", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,)
+        self.Fight_canvas_skillchoose_2.place(x=520,y=940)
+        self.Fight_canvas_skillchoose_3 = tk.Button(self.PlayTheGame,text="逃跑", anchor="nw", font=("微软雅黑", 17, "bold"),bd=0,command=self.create_play_game_main_canvas)
+        self.Fight_canvas_skillchoose_3.place(x=520,y=1000)
+        #人物立绘 x446 y574
+        self.Fight_canvas_playerimg_1 = tk.PhotoImage(file="python_simplegame\\playerimg\\player_set.png")
+        self.Fight_canvas_.create_image(0, 530, image=self.Fight_canvas_playerimg_1, anchor="nw")
+        #怪物立绘
+        self.Fight_canvas_monsterimg = tk.PhotoImage(file="python_simplegame\\Monsterimg\\zhizhu.png")
+        self.Fight_canvas_.create_image(200, 240, image=self.Fight_canvas_monsterimg, anchor="nw")
+
+
+    #                                               首要回合进行先后手的判定-随后进入s1回合
+    def Fight_f_(self):
+
+        self.Fight_canvas_setup()  # 加载画布
+        self.Fight_luckjudgment()  # 加载先后手判定
+        self.Fight_random_c = tk.Button(self.PlayTheGame,text="【下一回合】", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.Fight_s_1)
+        self.Fight_random_c.place(x=475,y=750)
+        self.Fightnext = 0
+        if self.first == 1:
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=150)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=155)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=75)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="第" + str(self.round+1) + "回合" + "你拿到了先手优势！开始你的操作",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475, bg=None)
+            self.Fight_text.place(x=15, y=75)
+            self.Fight_canvas_skillchoose_0 = tk.Button(self.PlayTheGame, text="物理攻击", anchor="nw",font=("微软雅黑", 17, "bold"), bd=0, command=self.FightPlayer_PA)
+            self.Fight_canvas_skillchoose_0.place(x=500, y=820)
+            self.first = 0
+        if self.first == 2:
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=150)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=155)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=75)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="第" + str(self.round) + "回合" + "怪物拿到了先手优势！请注意你的状态",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475, bg=None)
+            self.Fight_text.place(x=15, y=75)
+            self.FightMonster_PA()  # 怪物进行攻击
+            self.first = 0
+    
+    #                                              s1回合 承接首要回合和s2回合的来回判定
+    def Fight_s_1(self):
+        self.Fight_canvas_setup()  # 加载画布
+        self.Fight_random_c = tk.Button(self.PlayTheGame,text="【下一回合】", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.Fight_s_2)
+        self.Fight_random_c.place(x=475,y=750)
+        if self.G_round == 1:
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=150)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=155)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=75)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="第" + str(self.round) + "回合" + "怪物的回合结束了，现在是你的回合！",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475, bg=None)
+            self.Fight_text.place(x=15, y=75)
+            self.Fight_canvas_skillchoose_0 = tk.Button(self.PlayTheGame, text="物理攻击", anchor="nw",font=("微软雅黑", 17, "bold"), bd=0,command=self.FightPlayer_PA)
+            self.Fight_canvas_skillchoose_0.place(x=500, y=820)
+            self.Fight_hp_j() #玩家hp和怪物hp的检测
+
+        if self.G_round == 2:
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=150)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=155)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=75)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="第" + str(self.round) + "回合" + "你的回合结束了，现在是怪物的回合！请注意你的状态",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475, bg=None)
+            self.Fight_text.place(x=15, y=75)
+            self.FightMonster_PA()  # 怪物进行攻击
+            self.Fight_hp_j() #玩家hp和怪物hp的检测
+    #                                              s2回合 承接s1回合和s2回合的来回判定
+    def Fight_s_2(self):
+        self.Fight_canvas_setup()  # 加载画布
+        self.Fight_random_c = tk.Button(self.PlayTheGame,text="【下一回合】", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.Fight_s_1)
+        self.Fight_random_c.place(x=475,y=750)
+        if self.G_round == 1:
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=150)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=155)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=75)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="第" + str(self.round) + "回合" + "怪物的回合结束了，现在是你的回合！",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475, bg=None)
+            self.Fight_text.place(x=15, y=75)
+            self.Fight_canvas_skillchoose_0 = tk.Button(self.PlayTheGame, text="物理攻击", anchor="nw",font=("微软雅黑", 17, "bold"), bd=0,command=self.FightPlayer_PA)
+            self.Fight_canvas_skillchoose_0.place(x=500, y=820)
+            self.Fight_hp_j() #玩家hp和怪物hp的检测
+        if self.G_round == 2:
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=150)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=155)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
+            self.Fight_text.place(x=15, y=75)
+            self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="第" + str(self.round) + "回合" + "你的回合结束了，现在是怪物的回合！请注意你的状态",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475, bg=None)
+            self.Fight_text.place(x=15, y=75)
+            self.FightMonster_PA()  # 怪物进行攻击
+            self.Fight_hp_j() #玩家hp和怪物hp的检测
+                        
+                        
 
 #—————————————————————————————————————————————————↑↑↑↑↑战斗系统管理↑↑↑↑↑——————————————————————————————————————————————————————————————————————————————————
 #
@@ -877,6 +954,7 @@ class SimpleGame:
         self.PlayTheGame.title("欢迎来到蒂斯亚克大陆！")
         self.PlayTheGame.iconbitmap('python_simplegame\\qiji.ico')
         self.PlayTheGame.attributes('-fullscreen', True)
+        self.PlayTheGame.geometry("1920x1080")
         self.PlayTheGame.withdraw()
         # self.MenuTopSet()
         self.PlayTheGame_story_1()
