@@ -14,6 +14,7 @@ def zhizhu(self):
     self.M_Damage_deepen = 0.0       #伤害加深
     self.M_Damage_deduction = 0.0    #伤害减免
     self.M_Luck = 0.0  
+    self.M_exp = 200
 #巨型蜘蛛【boss】
 def boss_zhizhu(self):
     self.M_HP = 150
@@ -28,6 +29,7 @@ def boss_zhizhu(self):
     self.M_Damage_deepen = 0.0       #伤害加深
     self.M_Damage_deduction = 0.0    #伤害减免
     self.M_Luck = 5.0
+    self.M_exp = 2000
 #恐狼
 def konglang(self):
     self.M_HP = 70
@@ -42,6 +44,7 @@ def konglang(self):
     self.M_Damage_deepen = 0.0       #伤害加深
     self.M_Damage_deduction = 0.0    #伤害减免
     self.M_Luck = 0.0
+    self.M_exp = 400
 #恐狼领袖【boss】
 def boss_konglang(self):
     self.M_HP = 170
@@ -56,6 +59,7 @@ def boss_konglang(self):
     self.M_Damage_deepen = 0.0       #伤害加深
     self.M_Damage_deduction = 0.0    #伤害减免
     self.M_Luck = 5.0
+    self.M_exp = 3000
 #哥布林斥候
 def gebulinchihou(self):
     self.M_HP = 100
@@ -70,6 +74,7 @@ def gebulinchihou(self):
     self.M_Damage_deepen = 0.0       #伤害加深
     self.M_Damage_deduction = 0.0    #伤害减免
     self.M_Luck = 0.0
+    self.M_exp = 600
 #哥布林队长【boss】
 def boss_gebulinchihou(self):
     self.M_HP = 200
@@ -84,3 +89,4 @@ def boss_gebulinchihou(self):
     self.M_Damage_deepen = 0.0       #伤害加深
     self.M_Damage_deduction = 0.0    #伤害减免
     self.M_Luck = 5.0
+    self.M_exp = 4000

@@ -1,17 +1,28 @@
 from tkinter import *
 import tkinter as tk
+from tkinter import messagebox
+
 import random
 
 import Incident #导入事件模组
 import Monsterlist#导入怪物属性列表
+
+#Bug汇总处
+#1、如果进入战斗直接点击下一回合的话，就会执行空白画布接下来玩家不能攻击，怪物不能攻击。——————战斗系统管理
+
+#代码编写进程 - 2023.6.14
+#完善了等级系统，也做好了升级提升技能点。 该做 技能点 加点功能 了
+
+
 class SimpleGame:
-    HP = 100
-    HP_Max = 100
-    Attact = 20
-    Defense = 5
+    HP = 0.0
+    HP_Max = 0.0
+    Attact = 0
+    Defense = 0
     name = "未设定"
     Race = "未设定"
     Magical_adaptability = 0.0
+    Magical_adaptabilityUP = 0.0
     Str = 0
     Str_coefficient = 0.0
     Agi = 0
@@ -43,9 +54,9 @@ class SimpleGame:
     getitem = []              #战利品
 
     M_id = None               #怪物id
-    M_HP = 50
-    M_Damage = 10
-    M_Defense = 3
+    M_HP = 0
+    M_Damage = 0
+    M_Defense = 0
     M_name = "              "
     M_Crit_p = 0.0              #怪物暴击概率
     M_Crit_d = 0.0              #怪物暴击伤害  
@@ -54,7 +65,8 @@ class SimpleGame:
     M_Sidestep_r = 0.0          #怪物闪避抵抗
     M_Damage_deepen = 0.0       #怪物伤害加深
     M_Damage_deduction = 0.0    #怪物伤害减免
-    M_Luck = 5.0
+    M_Luck = 0.0
+    M_exp = 0
 
     def __init__(self,master):
         self.win = master
@@ -84,91 +96,152 @@ class SimpleGame:
 #
 #
 #—————————————————————————————————————————————————↓↓↓↓↓人物存档管理↓↓↓↓↓——————————————————————————————————————————————————————————————————————————————————
-    def Player_file(self): #创建
-        self.Player_file = open("python_simplegame\\save\\Player_save.txt",'w') 
-        self.Player_file.write(str(self.name) +'\r')    #姓名
-        self.Player_file.write(str(self.Race) + '\r')   #种族
-        self.Player_file.write(str(self.Magical_adaptability) + '\r')   #魔法适应程度
-        self.Player_file.write(str(self.Str) + '\r')    #力量
-        self.Player_file.write(str(self.Str_coefficient) + '\r')    #力量成长系数
-        self.Player_file.write(str(self.Agi) + '\r')    #敏捷
-        self.Player_file.write(str(self.Agi_coefficient) + '\r')    #敏捷成长系数
-        self.Player_file.write(str(self.Int) +'\r')   #智力
-        self.Player_file.write(str(self.Int_coefficient) +'\r') #智力成长系数
-        self.Player_file.close()
-    def Player_file_login(self):#读取
-        self.Player_file_login = open("python_simplegame\\save\\Player_save.txt",'r')
-        name = self.Player_file_login.readline()
-        race = self.Player_file_login.readline()
-        Magical_adaptability = self.Player_file_login.readline()
-        Str = self.Player_file_login.readline()
-        Str_coefficient = self.Player_file_login.readline()
-        Agi = self.Player_file_login.readline()
-        Agi_coefficient = self.Player_file_login.readline()
-        Int = self.Player_file_login.readline()
-        Int_coefficient = self.Player_file_login.readline()
-        self.name = name
-        self.Race = race
-        self.Magical_adaptability = Magical_adaptability
-        self.Str = Str
-        self.Str_coefficient = Str_coefficient
-        self.Agi = Agi
-        self.Agi_coefficient = Agi_coefficient
-        self.Int = Int
-        self.Int_coefficient = Int_coefficient
-        self.Player_file_login.close()
+    def Player_file(self):  # 创建人物存档
+        try:
+            with open("python_simplegame/save/Player_save.txt", 'w') as f:
+                f.write(str(self.name) + '\n')  # 姓名
+                f.write(str(self.Race) + '\n')  # 种族
+                f.write(str(self.Magical_adaptability) + '\n')  # 魔法适应程度
+                f.write(str(self.Str) + '\n')  # 力量
+                f.write(str(self.Str_coefficient) + '\n')  # 力量成长系数
+                f.write(str(self.Agi) + '\n')  # 敏捷
+                f.write(str(self.Agi_coefficient) + '\n')  # 敏捷成长系数
+                f.write(str(self.Int) + '\n')  # 智力
+                f.write(str(self.Int_coefficient) + '\n')  # 智力成长系数
+                f.write(str(self.ps) + '\n')   # 当前体力值
+                f.write(str(self.ps_max) + '\n')   # 最大体力值
+                f.write(str(self.Player_Level) + '\n')   # 玩家等级
+                f.write(str(self.Player_now) + '\n')   # 当前经验值
+                f.write(str(self.Player_need) + '\n')   # 所需经验值
+            messagebox.showinfo("保存成功", "人物存档已保存")
+        except Exception as e:
+            messagebox.showerror("保存失败", str(e))
+    def Player_file_login(self):  # 读取人物存档
+        try:
+            with open("python_simplegame/save/Player_save.txt", 'r') as f:
+                lines = f.readlines()
+                self.name = lines[0].strip()  # 姓名
+                self.Race = lines[1].strip()  # 种族
+                self.Magical_adaptability = lines[2].strip()  # 魔法适应程度
+                self.Str = lines[3].strip()  # 力量
+                self.Str_coefficient = lines[4].strip()  # 力量成长系数
+                self.Agi = lines[5].strip()  # 敏捷
+                self.Agi_coefficient = lines[6].strip()  # 敏捷成长系数
+                self.Int = lines[7].strip()  # 智力
+                self.Int_coefficient = lines[8].strip()  # 智力成长系数
+                self.ps = lines[9].strip()  # 当前体力值
+                self.ps_max = lines[10].strip()  # 最大体力值
+                self.Player_Level = lines[11].strip()   # 玩家等级
+                self.Player_now = lines[12].strip()   # 当前经验值
+                self.Player_need = lines[13].strip()   # 所需经验值
+            messagebox.showinfo("读取成功", "已读取人物存档")
+        except Exception as e:
+            messagebox.showerror("读取失败", str(e))
+
 #—————————————————————————————————————————————————↑↑↑↑↑人物存档管理↑↑↑↑↑——————————————————————————————————————————————————————————————————————————————————
 #
 #
-#—————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+#
+#—————————————————————————————————————————————————↓↓↓↓↓人物属性管理↓↓↓↓↓——————————————————————————————————————————————————————————————————————————————————
+    def player_level(self):#等级系统 
+        self.Player_Level_nowset = int(self.Player_now) + int(self.Player_get)
+        self.Player_Level_needset = int(self.Player_need)
+        while int(self.Player_Level_nowset) >= int(self.Player_Level_needset):
+            self.Player_Level = int(self.Player_Level) + 1
+            self.Skinpoint = self.Skinpoint + 4
+            self.Player_Level_nowset = int(self.Player_Level_nowset) - int(self.Player_Level_needset)
+            self.Player_Level_needset = int(self.Player_Level) * 100 + int(self.Player_Level_needset)
+            self.Player_need = int(self.Player_Level_needset)
+            self.Player_now = int(self.Player_Level_nowset)
+            self.create_play_game_main_canvas__Characterattributes()
+
     def player_hp(self):#玩家血量系统
-        while(True):
-            self.HP_Max_up = int(self.HP_Max) + int(self.Str) * 4
-            self.HP_Max_set = int(self.HP_Max_up)
-            self.HPif = self.Str
-            if(self.Str == self.HPif):
-                break
+        self.HP_MaxGet = int(self.Str) + 100 * 4
     def player_Attact(self):#玩家攻击力系统
-        while(True):
-            self.Attact_UP = 0
-            self.Attact_UP = int(self.Attact_UP) + int(self.Str) * 0.5
-            self.Attact_set = int(self.Attact) + int(self.Attact_UP)
-            self.Attactif = self.Str
-            if(self.Str == self.Attactif):
-                break
+        self.AttactGet = 20 + int(self.Str) *0.5
     def player_defense(self):#玩家防御力系统
-        self.Defenseif = 0
-        while(self.Defenseif != self.Agi):
-            self.Defense_UP = 0
-            self.Defense_UP = int(self.Defense_UP) + int(self.Agi) * 0.2
-            self.Defense_set = int(self.Defense) + int(self.Defense_UP)
-            self.Defenseif = self.Agi
+        self.DefenseGet = 5 + int(self.Agi) * 0.2
+    def player_Magical_adaptability(self):#玩家魔法适应程度
+        self.Magical_adaptabilityUP = self.Magical_adaptability
+        self.Magical_adaptabilityGet = "{:.2f}".format(float(self.Magical_adaptabilityUP) + int(self.Int) * 0.1)
+    def player_luckey(self):#玩家幸运值
+        self.LuckGet = 10 + int(self.Int) * 0.2
+    def player_Crit_p(self):#玩家暴击概率
+        self.Crit_pGet = int(self.Agi) * 0.1
+    def player_Sidestep_p(self):#玩家闪避概率
+        self.Sidestep_pGet = int(self.Agi) * 0.1
 
-
-    def player_level(self):#等级系统
-        self.Player_Level_nowset = self.Player_now + self.Player_get
-        self.Player_Level_needset = self.Player_need + self.Player_Level * 100
-        while self.Player_Level_nowset >= self.Player_Level_needset:
-            self.Player_Level += 1
-            self.Player_Level_nowset = self.Player_Level_nowset - self.Player_Level_needset
-            self.Player_Level_needset = self.Player_Level * 100 + self.Player_Level_needset
-
-        #【bug】一、现在遇到了刷新属性，属性会各次叠加
-        #这个是升级属性后的判定，还需要完善
+    #确认属性后进行属性加减然后返回大厅界面
     def create_play_game_main_canvas_playerinforeload(self):
+        #生命值
         self.player_hp()
         self.HP_Max = "                     "
-        self.HP_Max = self.HP_Max_set
+        self.HP_Max = self.HP_MaxGet
+        self.HP = "                     "
+        self.HP = self.HP_MaxGet
+        #攻击力
         self.player_Attact()
         self.Attact = "                     "
-        self.Attact = self.Attact_set                                                                                                                                                                                                                              
+        self.Attact = self.AttactGet
+        #防御力
         self.player_defense()
         self.Defense = "                     "
-        self.Defense = self.Defense_set
+        self.Defense = self.DefenseGet
+        #魔法适应程度
+        self.player_Magical_adaptability()
+        self.Magical_adaptabilityUP = "                     "
+        self.Magical_adaptabilityUP = self.Magical_adaptabilityGet
+        #运气
+        self.player_luckey()
+        self.Luck = "                     "
+        self.Luck = self.LuckGet
+        #暴击概率
+        self.player_Crit_p()
+        self.Crit_p = "                     "
+        self.Crit_p = self.Crit_pGet
+        #闪避概率
+        self.player_Sidestep_p()
+        self.Sidestep_p = "                     "
+        self.Sidestep_p = self.Sidestep_pGet
         self.create_play_game_main_canvas()
 
+    #每次返回大厅界面的时候进行表面刷新并确认属性使用
+    def create_play_game_main_canvas_playerinforeload_2(self): 
+        #生命值
+        self.player_hp()
+        self.HP_Max = "                     "
+        self.HP_Max = self.HP_MaxGet
+        self.HP = "                     "
+        self.HP = self.HP_MaxGet
+        #攻击力
+        self.player_Attact()
+        self.Attact = "                     "
+        self.Attact = self.AttactGet
+        #防御力
+        self.player_defense()
+        self.Defense = "                     "
+        self.Defense = self.DefenseGet
+        #魔法适应程度
+        self.player_Magical_adaptability()
+        self.Magical_adaptabilityUP = "                     "
+        self.Magical_adaptabilityUP = self.Magical_adaptabilityGet
+        #运气
+        self.player_luckey()
+        self.Luck = "                     "
+        self.Luck = self.LuckGet
+        #暴击概率
+        self.player_Crit_p()
+        self.Crit_p = "                     "
+        self.Crit_p = self.Crit_pGet
+        #闪避概率
+        self.player_Sidestep_p()
+        self.Sidestep_p = "                     "
+        self.Sidestep_p = self.Sidestep_pGet
+#—————————————————————————————————————————————————↑↑↑↑↑人物属性管理↑↑↑↑↑——————————————————————————————————————————————————————————————————————————————————
+#
+#
+#
 #—————————————————————————————————————————————————↓↓↓↓↓战斗系统管理↓↓↓↓↓——————————————————————————————————————————————————————————————————————————————————
-#战斗系统bug——1：如果进入战斗直接点击下一回合的话  就会执行空白画布接下来玩家不能攻击怪物不能攻击
 
     def Fight_track(self):
         if self.M_id == 1:
@@ -228,6 +301,7 @@ class SimpleGame:
             self.Fight_text.place(x=15, y=75)
             self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="怪物被你斩杀！你获得了胜利",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
             self.Fight_text.place(x=15, y=70)
+            self.exp
 
     def FightPlayer_PA(self):
         damage = self.Attact - self.M_Defense
@@ -312,8 +386,6 @@ class SimpleGame:
 
         self.Fight_canvas_setup()  # 加载画布
         self.Fight_luckjudgment()  # 加载先后手判定
-        self.Fight_random_c = tk.Button(self.PlayTheGame,text="【下一回合】", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.Fight_s_1)
-        self.Fight_random_c.place(x=475,y=750)
         self.Fightnext = 0
         if self.first == 1:
             self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
@@ -327,6 +399,8 @@ class SimpleGame:
             self.Fight_canvas_skillchoose_0 = tk.Button(self.PlayTheGame, text="物理攻击", anchor="nw",font=("微软雅黑", 17, "bold"), bd=0, command=self.FightPlayer_PA)
             self.Fight_canvas_skillchoose_0.place(x=500, y=820)
             self.first = 0
+            self.Fight_random_c = tk.Button(self.PlayTheGame,text="【下一回合】", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.Fight_s_1)
+            self.Fight_random_c.place(x=475,y=750)
         if self.first == 2:
             self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
             self.Fight_text.place(x=15, y=150)
@@ -338,6 +412,8 @@ class SimpleGame:
             self.Fight_text.place(x=15, y=75)
             self.FightMonster_PA()  # 怪物进行攻击
             self.first = 0
+            self.Fight_random_c = tk.Button(self.PlayTheGame,text="【下一回合】", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.Fight_s_1)
+            self.Fight_random_c.place(x=475,y=750)
     
     #                                              s1回合 承接首要回合和s2回合的来回判定
     def Fight_s_1(self):
@@ -421,8 +497,8 @@ class SimpleGame:
         self.I_button_ = tk.Button(self.Incident_canvas,text="继续", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.AreaLevel10_canvas_)
         self.I_button_.place(x=950,y=540)
     def AreaLevel10_canvas_(self):
-        if self.ps != 0:
-            self.ps -= 10
+        if int(self.ps) > 0:
+            self.ps = int(self.ps) - 10
             self.Incident_order()
             self.AreaLevel10_canvas = tk.Canvas(self.Incident_canvas, width=1550, height=430, bg=None)
             self.AreaLevel10_canvas.place(x=185, y=150)
@@ -445,7 +521,7 @@ class SimpleGame:
         self.I_label_.place(x=220,y=50)
         self.AreaLevel10_canvas_()
     def ps_if_(self):
-        if self.ps == 0:
+        if int(self.ps) <= 0:
             self.Incident_canvas = tk.Canvas(self.PlayTheGame, width=1920, height=775, bg=None)
             self.Incident_canvas.place(x=-2, y=0)
             self.I_label_ = tk.Label(self.Incident_canvas,text="体力值:",font=('微软雅黑',17, "bold"),anchor='nw')
@@ -463,7 +539,7 @@ class SimpleGame:
             self.AreaLevel10_button_ = tk.Button(self.Incident_canvas,text="继续", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.AreaLevel10_AG)
             self.AreaLevel10_button_.place(x=950,y=540)
     def Getitem_list(self):
-        if self.ps == 0:
+        if int(self.ps) == 0:
             self.Incident_canvas = tk.Canvas(self.PlayTheGame, width=1920, height=775, bg=None)
             self.Incident_canvas.place(x=-2, y=0)
             self.I_label_ = tk.Label(self.Incident_canvas,text="体力值:",font=('微软雅黑',17, "bold"),anchor='nw')
@@ -956,7 +1032,7 @@ class SimpleGame:
         self.PlayTheGame.attributes('-fullscreen', True)
         self.PlayTheGame.geometry("1920x1080")
         self.PlayTheGame.withdraw()
-        # self.MenuTopSet()
+        self.PlayTheGame.bind('<Escape>', self.GameMain_shutdown)
         self.PlayTheGame_story_1()
 
     def PlayTheGameToplevel_change(self):
@@ -964,6 +1040,22 @@ class SimpleGame:
         self.PlayTheGame.deiconify()
         self.Player_Create_set.withdraw()#关闭人物创建界面
         self.win.withdraw()#关闭开始游戏界面
+
+    def GameMain_shutdown(self,event):
+        self.GameMain_shutdown_canvas = tk.Canvas(self.PlayTheGame, width= 1920, height=1080,bg=None)
+        self.GameMain_shutdown_canvas.place(x=0, y=0)
+        self.GameMain_shutdown_photo = tk.PhotoImage(file="python_simplegame\\mainimg\\Title_2.png")
+        self.GameMain_shutdown_canvas.create_image(330,50,image=self.GameMain_shutdown_photo,anchor='nw')
+        self.GameMain_shutdown_button_1 = tk.Button(self.GameMain_shutdown_canvas,bd=0,text="返回大厅",font=("微软雅黑", 22, "bold"),command=self.create_play_game_main_canvas)
+        self.GameMain_shutdown_button_1.place(x=875, y=450)
+        self.GameMain_shutdown_button_2 = tk.Button(self.GameMain_shutdown_canvas,bd=0,text="保存游戏",font=("微软雅黑", 22, "bold"),command=self.Player_file)
+        self.GameMain_shutdown_button_2.place(x=875, y=550)
+        self.GameMain_shutdown_button_3 = tk.Button(self.GameMain_shutdown_canvas,bd=0,text="读取游戏",font=("微软雅黑", 22, "bold"),command=self.Player_file_login)
+        self.GameMain_shutdown_button_3.place(x=875, y=650)
+        self.GameMain_shutdown_button_4 = tk.Button(self.GameMain_shutdown_canvas,bd=0,text="退出游戏",font=("微软雅黑", 22, "bold"),command=self.win.quit)
+        self.GameMain_shutdown_button_4.place(x=875, y=750)
+        self.GameMain_shutdown_canvas.create_text(980,1000,text="看到这个界面表示你摁ECS辣！现在是回不去你之前的界面辣！问就是我懒！",font=("微软雅黑", 20))
+
 #————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
     #                                                           初始剧情介绍
     def PlayTheGame_story_1(self):
@@ -1019,6 +1111,9 @@ class SimpleGame:
         self.play_game_main_choose_7.place(x=720,y=520)
         self.play_game_main_choose_8 = tk.Button(self.play_game_main_canvas,bd=0,text="前往野外",font=("微软雅黑", 22, "bold"),command=self.Map_levelchoose)
         self.play_game_main_choose_8.place(x=1450,y=120)
+        self.play_game_main_choose_9 = tk.Button(self.play_game_main_canvas,bd=0,text="酒馆",font=("微软雅黑", 22, "bold"),command=self.create_play_game_main_canvas__tavern)
+        self.play_game_main_choose_9.place(x=1450,y=580)
+        self.create_play_game_main_canvas_playerinforeload_2()
         self.play_game_main_canvas.create_text(550, 845, text=self.name, anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
         self.play_game_main_canvas.create_text(1010, 845, text=self.Race, anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
         self.play_game_main_canvas.create_text(850, 845, text=self.Player_Level, anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
@@ -1026,9 +1121,17 @@ class SimpleGame:
         self.play_game_main_canvas.create_text(1010, 912, text=self.Str, anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
         self.play_game_main_canvas.create_text(1010, 965, text=self.Agi, anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
         self.play_game_main_canvas.create_text(1010, 1017, text=self.Int, anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
-        self.play_game_main_canvas.create_text(730, 1017, text=self.Magical_adaptability, anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
+        self.play_game_main_canvas.create_text(730, 1017, text=self.Magical_adaptabilityUP, anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
         self.play_game_main_canvas.create_text(630, 912, text=self.Attact, anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
         self.play_game_main_canvas.create_text(630, 965, text=self.Defense, anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
+        self.I_label_PlayGameMain = tk.Label(self.play_game_main_canvas,text="体力值:",font=('微软雅黑',17, "bold"),anchor='nw')
+        self.I_label_PlayGameMain.place(x=50,y=50)
+        self.I_label_PlayGameMain = tk.Label(self.play_game_main_canvas,text=self.ps,font=('微软雅黑',17, "bold"),anchor='nw')
+        self.I_label_PlayGameMain.place(x=150,y=50)
+        self.I_label_PlayGameMain = tk.Label(self.play_game_main_canvas,text="/",font=('微软雅黑',17, "bold"),anchor='nw')
+        self.I_label_PlayGameMain.place(x=200,y=50)
+        self.I_label_PlayGameMain = tk.Label(self.play_game_main_canvas,text=self.ps_max,font=('微软雅黑',17, "bold"),anchor='nw')
+        self.I_label_PlayGameMain.place(x=220,y=50)
 
     def Map_levelchoose(self):                                 
         self.Map_levelchoose_canvas = tk.Canvas(self.PlayTheGame, width=1920, height=775, bg=None)
@@ -1054,8 +1157,8 @@ class SimpleGame:
         self.play_game_main_canvasphoto__Characterattributes = tk.PhotoImage(file="python_simplegame\\mainui\\人物属性\\人物属性-介绍.png")
         self.play_game_main_canvas__Characterattributes.create_image(0, 0, image=self.play_game_main_canvasphoto__Characterattributes, anchor="nw")
         #技能点描述
-        self.play_game_main_canvas__Characterattributes.create_text(520,25,text=self.Skinpoint, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
-        # 主属性额外加点描述
+        self.play_game_main_canvas__Characterattributes.create_text(520,30,text=self.Skinpoint, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
+        #主属性额外加点描述
         self.play_game_main_canvas__Characterattributes.create_text(330,100,text=self.Skinpoint_str, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
         self.play_game_main_canvas__Characterattributes.create_text(330,150,text=self.Skinpoint_agi, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
         self.play_game_main_canvas__Characterattributes.create_text(330,200,text=self.Skinpoint_int, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
@@ -1068,14 +1171,14 @@ class SimpleGame:
         self.play_game_main_canvas__Characterattributes.create_text(165,355,text=self.Attact, anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
         self.play_game_main_canvas__Characterattributes.create_text(165,405,text=self.Defense, anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
         #暴击描述        
-        self.play_game_main_canvas__Characterattributes.create_text(195,450,text=self.Crit_p * 100, anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
+        self.play_game_main_canvas__Characterattributes.create_text(195,450,text=self.Crit_p * 1, anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
         self.play_game_main_canvas__Characterattributes.create_text(195,500,text=self.Crit_d * 100, anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
         self.play_game_main_canvas__Characterattributes.create_text(195,550,text=self.Crit_r * 100, anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
         self.play_game_main_canvas__Characterattributes.create_text(230,450,text="  %", anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
         self.play_game_main_canvas__Characterattributes.create_text(285,500,text="%", anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
         self.play_game_main_canvas__Characterattributes.create_text(230,550,text="  %", anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
         #闪避描述
-        self.play_game_main_canvas__Characterattributes.create_text(500,500,text=self.Sidestep_p * 100, anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
+        self.play_game_main_canvas__Characterattributes.create_text(500,500,text=self.Sidestep_p * 1, anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
         self.play_game_main_canvas__Characterattributes.create_text(500,550,text=self.Sidestep_r * 100, anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
         self.play_game_main_canvas__Characterattributes.create_text(550,500,text=" %", anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
         self.play_game_main_canvas__Characterattributes.create_text(550,550,text=" %", anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
@@ -1096,7 +1199,7 @@ class SimpleGame:
         self.play_game_main_choose_2 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_1,bd=0,)
         self.play_game_main_choose_2.place(x=470,y=200)
         self.play_game_main_canvasphoto__Characterattributes_2 = tk.PhotoImage(file="python_simplegame\\mainui\\人物属性\\提升等级.png")
-        self.play_game_main_choose_3 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_2,bd=0,)
+        self.play_game_main_choose_3 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_2,bd=0,command=self.player_level)
         self.play_game_main_choose_3.place(x=1005,y=565)
         self.play_game_main_canvasphoto__Characterattributes_3 = tk.PhotoImage(file="python_simplegame\\mainui\\人物属性\\确认应用.png")
         self.play_game_main_choose_4 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_3,bd=0,command=self.create_play_game_main_canvas_playerinforeload)
@@ -1104,7 +1207,16 @@ class SimpleGame:
         self.play_game_main_canvasphoto__Characterattributes_4 = tk.PhotoImage(file="python_simplegame\\mainui\\人物属性\\返回.png")
         self.play_game_main_choose_5 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_4,bd=0,command=self.create_play_game_main_canvas)
         self.play_game_main_choose_5.place(x=1005,y=685)
-
+    
+    def create_play_game_main_canvas__tavern(self):
+        self.tavern_mes = messagebox.askyesno("酒馆", "您可以免费回复全部体力值，是否要继续？")
+        if self.tavern_mes:
+            messagebox.showinfo("酒馆","酒馆侍女为你温了一杯酒，短暂歇息后你的体力值已全部恢复。")
+            self.ps = self.ps_max
+            self.create_play_game_main_canvas()
+        else:
+            self.create_play_game_main_canvas()
+    
 if __name__ == "__main__":
     win = Tk()
     win.iconbitmap('python_simplegame\\qiji.ico')
