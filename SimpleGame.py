@@ -10,8 +10,8 @@ import Monsterlist#导入怪物属性列表
 #Bug汇总处
 #1、如果进入战斗直接点击下一回合的话，就会执行空白画布接下来玩家不能攻击，怪物不能攻击。——————战斗系统管理
 
-#代码编写进程 - 2023.6.14
-#完善了等级系统，也做好了升级提升技能点。 该做 技能点 加点功能 了
+#代码编写进程 - 2023.6.20
+#完善了技能加点 改写战斗时添加暴击闪避等特殊效果了
 
 
 class SimpleGame:
@@ -71,7 +71,7 @@ class SimpleGame:
     def __init__(self,master):
         self.win = master
         self.win.geometry("1280x800")
-        self.win.title("为美好的小暗献上祝福！ -开发版本beta-0.1-  测试ing")
+        self.win.title("为美好的小暗献上祝福！ -beta-1.0-  少女测试中……")
         self.Player_Create_set() # 创建新建人物窗口
         self.PlayTheGame()# 创建游戏主要窗口
         self.MenuGameCanvas() #创建开始界面窗口
@@ -113,6 +113,7 @@ class SimpleGame:
                 f.write(str(self.Player_Level) + '\n')   # 玩家等级
                 f.write(str(self.Player_now) + '\n')   # 当前经验值
                 f.write(str(self.Player_need) + '\n')   # 所需经验值
+                f.write(str(self.Skinpoint) + '\n') #技能点
             messagebox.showinfo("保存成功", "人物存档已保存")
         except Exception as e:
             messagebox.showerror("保存失败", str(e))
@@ -134,6 +135,7 @@ class SimpleGame:
                 self.Player_Level = lines[11].strip()   # 玩家等级
                 self.Player_now = lines[12].strip()   # 当前经验值
                 self.Player_need = lines[13].strip()   # 所需经验值
+                self.Skinpoint = lines[14].strip() # 技能点
             messagebox.showinfo("读取成功", "已读取人物存档")
         except Exception as e:
             messagebox.showerror("读取失败", str(e))
@@ -203,6 +205,16 @@ class SimpleGame:
         self.player_Sidestep_p()
         self.Sidestep_p = "                     "
         self.Sidestep_p = self.Sidestep_pGet
+        #技能点检测
+        if self.Skinpoint_str > 0:
+            self.Str = int(self.Str) + int(self.Skinpoint_str)
+            self.Skinpoint_str = 0
+        elif self.Skinpoint_int > 0:
+            self.Int = int(self.Int) + int(self.Skinpoint_int)
+            self.Skinpoint_int = 0
+        elif self.Skinpoint_agi > 0:
+            self.Agi = int(self.Agi) + int(self.Skinpoint_agi)
+            self.Skinpoint_agi = 0
         self.create_play_game_main_canvas()
 
     #每次返回大厅界面的时候进行表面刷新并确认属性使用
@@ -237,12 +249,21 @@ class SimpleGame:
         self.player_Sidestep_p()
         self.Sidestep_p = "                     "
         self.Sidestep_p = self.Sidestep_pGet
+        #技能点检测
+        if self.Skinpoint_str > 0:
+            self.Str = int(self.Str) + int(self.Skinpoint_str)
+            self.Skinpoint_str = 0
+        elif self.Skinpoint_int > 0:
+            self.Int = int(self.Int) + int(self.Skinpoint_int)
+            self.Skinpoint_int = 0
+        elif self.Skinpoint_agi > 0:
+            self.Agi = int(self.Agi) + int(self.Skinpoint_agi)
+            self.Skinpoint_agi = 0
 #—————————————————————————————————————————————————↑↑↑↑↑人物属性管理↑↑↑↑↑——————————————————————————————————————————————————————————————————————————————————
 #
 #
 #
 #—————————————————————————————————————————————————↓↓↓↓↓战斗系统管理↓↓↓↓↓——————————————————————————————————————————————————————————————————————————————————
-
     def Fight_track(self):
         if self.M_id == 1:
             Monsterlist.zhizhu(self)
@@ -257,8 +278,6 @@ class SimpleGame:
         elif self.M_id == 6:
             Monsterlist.boss_gebulinchihou(self)
         self.Fight_f_() #启动战斗画面
-
-
     def Fight_luckjudgment(self):
         pluck = self.Luck
         mluck = self.M_Luck
@@ -272,8 +291,6 @@ class SimpleGame:
                 self.first = 2
         elif mluck > pluck:
             self.first = 2
-
-
     def Fight_hp_j(self):
         if self.HP < 0:
             self.Fight_canvas_setup()  # 加载画布
@@ -287,8 +304,6 @@ class SimpleGame:
             self.Fight_text.place(x=15, y=75)
             self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="你不幸重伤倒地。怪物获得了胜利",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
             self.Fight_text.place(x=15, y=70)
-            
-            
         if self.M_HP < 0:
             self.Fight_canvas_setup()  # 加载画布
             self.Fight_random_c = tk.Button(self.PlayTheGame,text="【退出战斗】", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.create_play_game_main_canvas)
@@ -301,12 +316,10 @@ class SimpleGame:
             self.Fight_text.place(x=15, y=75)
             self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="怪物被你斩杀！你获得了胜利",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
             self.Fight_text.place(x=15, y=70)
-            self.exp
-
+            self.Player_get = self.Player_get + self.M_exp
     def FightPlayer_PA(self):
         damage = self.Attact - self.M_Defense
         self.M_HP -= damage
-
         self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="你对其造成了" + str(damage) + "点物理伤害",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475, bg=None)
         self.Fight_text.place(x=15, y=150)
         self.G_round = 2
@@ -314,12 +327,10 @@ class SimpleGame:
     def FightMonster_PA(self):
         damage = self.M_Damage - self.Defense
         self.HP -= damage
-
         self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="怪物对你造成了" + str(damage) + "点物理伤害",font=('微软雅黑', 17, "bold"), anchor='nw', justify='left', wraplength=475, bg=None)
         self.Fight_text.place(x=15, y=150)
         self.G_round = 1
         self.round += 1
-
     #战斗系统的画面设置
     def Fight_canvas_setup(self):
         self.Fight_canvas_ = tk.Canvas(self.PlayTheGame, width=1920, height=1080, bg=None)
@@ -351,7 +362,6 @@ class SimpleGame:
         self.PlayTheGame.after(100, Fight_canvas_hpset)  # 延迟100毫秒后执行Fight_canvas_hpset函数
         Fight_canvas_hpset()
         #————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
         self.Fight_canvas_.create_text(970, 405, text=self.name + "[Level:   " + str(self.Player_Level) + "  ]", anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
         self.Fight_canvas_.create_text(140, 140, text=self.M_name, anchor="nw", fill="black", font=("微软雅黑", 20, "bold"))
         #人物
@@ -379,11 +389,8 @@ class SimpleGame:
         #怪物立绘
         self.Fight_canvas_monsterimg = tk.PhotoImage(file="python_simplegame\\Monsterimg\\zhizhu.png")
         self.Fight_canvas_.create_image(200, 240, image=self.Fight_canvas_monsterimg, anchor="nw")
-
-
     #                                               首要回合进行先后手的判定-随后进入s1回合
     def Fight_f_(self):
-
         self.Fight_canvas_setup()  # 加载画布
         self.Fight_luckjudgment()  # 加载先后手判定
         self.Fightnext = 0
@@ -414,7 +421,6 @@ class SimpleGame:
             self.first = 0
             self.Fight_random_c = tk.Button(self.PlayTheGame,text="【下一回合】", anchor="nw", font=("微软雅黑", 18, "bold"),bd=0,command=self.Fight_s_1)
             self.Fight_random_c.place(x=475,y=750)
-    
     #                                              s1回合 承接首要回合和s2回合的来回判定
     def Fight_s_1(self):
         self.Fight_canvas_setup()  # 加载画布
@@ -432,7 +438,6 @@ class SimpleGame:
             self.Fight_canvas_skillchoose_0 = tk.Button(self.PlayTheGame, text="物理攻击", anchor="nw",font=("微软雅黑", 17, "bold"), bd=0,command=self.FightPlayer_PA)
             self.Fight_canvas_skillchoose_0.place(x=500, y=820)
             self.Fight_hp_j() #玩家hp和怪物hp的检测
-
         if self.G_round == 2:
             self.Fight_text = tk.Label(self.Fight_canvas_noteset, text="                                                                     ",font=('微软雅黑', 50, "bold"), anchor='nw', justify='left', wraplength=475,bg=None)
             self.Fight_text.place(x=15, y=150)
@@ -1022,15 +1027,17 @@ class SimpleGame:
 #
 #          
 #
-#
+#0
 #
 #—————————————————————————————————————————————————↓↓↓↓↓主要游戏系统↓↓↓↓↓——————————————————————————————————————————————————————————————————————————————————
     def PlayTheGame(self):
-        self.PlayTheGame = tk.Toplevel(self.Player_Create_set,width=1920,height=1080)
-        self.PlayTheGame.title("欢迎来到蒂斯亚克大陆！")
+        self.PlayTheGame = tk.Toplevel(self.Player_Create_set)
+        self.PlayTheGame.title("欢迎来到蒂斯亚克大陆！ -beta-1.0-  少女测试中……")
         self.PlayTheGame.iconbitmap('python_simplegame\\qiji.ico')
         self.PlayTheGame.attributes('-fullscreen', True)
         self.PlayTheGame.geometry("1920x1080")
+        self.PlayTheGame.minsize(1920, 1080)
+        self.PlayTheGame.maxsize(1920, 1080)
         self.PlayTheGame.withdraw()
         self.PlayTheGame.bind('<Escape>', self.GameMain_shutdown)
         self.PlayTheGame_story_1()
@@ -1157,11 +1164,35 @@ class SimpleGame:
         self.play_game_main_canvasphoto__Characterattributes = tk.PhotoImage(file="python_simplegame\\mainui\\人物属性\\人物属性-介绍.png")
         self.play_game_main_canvas__Characterattributes.create_image(0, 0, image=self.play_game_main_canvasphoto__Characterattributes, anchor="nw")
         #技能点描述
-        self.play_game_main_canvas__Characterattributes.create_text(520,30,text=self.Skinpoint, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
+        self.skinpointid = self.play_game_main_canvas__Characterattributes.create_text(520,30,text=self.Skinpoint, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
         #主属性额外加点描述
-        self.play_game_main_canvas__Characterattributes.create_text(330,100,text=self.Skinpoint_str, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
-        self.play_game_main_canvas__Characterattributes.create_text(330,150,text=self.Skinpoint_agi, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
-        self.play_game_main_canvas__Characterattributes.create_text(330,200,text=self.Skinpoint_int, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
+        self.skinpointid_str = self.play_game_main_canvas__Characterattributes.create_text(350,100,text=self.Skinpoint_str, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",),)
+        self.skinpointid_agi = self.play_game_main_canvas__Characterattributes.create_text(350,150,text=self.Skinpoint_agi, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
+        self.skinpointid_int = self.play_game_main_canvas__Characterattributes.create_text(350,200,text=self.Skinpoint_int, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
+        def skinpoint_set_str(): #技能点加点 - 力量
+            if int(self.Skinpoint) > 0:
+                self.Skinpoint_str = int(self.Skinpoint_str) + 1
+                self.play_game_main_canvas__Characterattributes.delete(self.skinpointid_str)
+                self.skinpointid_str = self.play_game_main_canvas__Characterattributes.create_text(350,100,text=self.Skinpoint_str, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
+                self.Skinpoint = int(self.Skinpoint) - 1
+                self.play_game_main_canvas__Characterattributes.delete(self.skinpointid)
+                self.skinpointid = self.play_game_main_canvas__Characterattributes.create_text(520,30,text=self.Skinpoint, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
+        def skinpoint_set_agi(): #技能点加点 - 敏捷
+            if int(self.Skinpoint) > 0:
+                self.Skinpoint_agi = int(self.Skinpoint_agi) + 1
+                self.play_game_main_canvas__Characterattributes.delete(self.skinpointid_agi)
+                self.skinpointid_agi = self.play_game_main_canvas__Characterattributes.create_text(350,150,text=self.Skinpoint_agi, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
+                self.Skinpoint = int(self.Skinpoint) - 1
+                self.play_game_main_canvas__Characterattributes.delete(self.skinpointid)
+                self.skinpointid = self.play_game_main_canvas__Characterattributes.create_text(520,30,text=self.Skinpoint, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
+        def skinpoint_set_int(): #技能点加点 - 智力
+            if int(self.Skinpoint) > 0:
+                self.Skinpoint_int = int(self.Skinpoint_int) + 1
+                self.play_game_main_canvas__Characterattributes.delete(self.skinpointid_int)
+                self.skinpointid_int = self.play_game_main_canvas__Characterattributes.create_text(350,200,text=self.Skinpoint_int, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
+                self.Skinpoint = int(self.Skinpoint) - 1
+                self.play_game_main_canvas__Characterattributes.delete(self.skinpointid)
+                self.skinpointid = self.play_game_main_canvas__Characterattributes.create_text(520,30,text=self.Skinpoint, anchor="nw", fill="#277f00", font=("微软雅黑", 23, "bold",))
         #基本信息描述
         self.play_game_main_canvas__Characterattributes.create_text(165,100,text=self.Str, anchor="nw", fill="black", font=("微软雅黑", 25, "bold"))
         self.play_game_main_canvas__Characterattributes.create_text(165,150,text=self.Agi, anchor="nw", fill="black", font=("微软雅黑", 25, "bold"))
@@ -1192,11 +1223,11 @@ class SimpleGame:
         self.play_game_main_canvas__Characterattributes.create_text(220,705,text=self.Player_need, anchor="nw", fill="black", font=("微软雅黑", 23, "bold"))
         #按钮放置
         self.play_game_main_canvasphoto__Characterattributes_1 = tk.PhotoImage(file="python_simplegame\\mainui\\人物属性\\加点.png")
-        self.play_game_main_choose_0 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_1,bd=0,)
+        self.play_game_main_choose_0 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_1,bd=0,command=skinpoint_set_str)
         self.play_game_main_choose_0.place(x=470,y=100)
-        self.play_game_main_choose_1 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_1,bd=0,)
+        self.play_game_main_choose_1 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_1,bd=0,command=skinpoint_set_agi)
         self.play_game_main_choose_1.place(x=470,y=150)
-        self.play_game_main_choose_2 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_1,bd=0,)
+        self.play_game_main_choose_2 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_1,bd=0,command=skinpoint_set_int)
         self.play_game_main_choose_2.place(x=470,y=200)
         self.play_game_main_canvasphoto__Characterattributes_2 = tk.PhotoImage(file="python_simplegame\\mainui\\人物属性\\提升等级.png")
         self.play_game_main_choose_3 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_2,bd=0,command=self.player_level)
@@ -1207,7 +1238,6 @@ class SimpleGame:
         self.play_game_main_canvasphoto__Characterattributes_4 = tk.PhotoImage(file="python_simplegame\\mainui\\人物属性\\返回.png")
         self.play_game_main_choose_5 = tk.Button(self.play_game_main_canvas__Characterattributes,image=self.play_game_main_canvasphoto__Characterattributes_4,bd=0,command=self.create_play_game_main_canvas)
         self.play_game_main_choose_5.place(x=1005,y=685)
-    
     def create_play_game_main_canvas__tavern(self):
         self.tavern_mes = messagebox.askyesno("酒馆", "您可以免费回复全部体力值，是否要继续？")
         if self.tavern_mes:
@@ -1215,7 +1245,13 @@ class SimpleGame:
             self.ps = self.ps_max
             self.create_play_game_main_canvas()
         else:
-            self.create_play_game_main_canvas()
+            self.create_play_game_main_canvas()    
+
+
+
+
+
+
     
 if __name__ == "__main__":
     win = Tk()
